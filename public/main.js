@@ -15,7 +15,7 @@
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
   canvas.addEventListener('mouseout', onMouseUp, false);
-  canvas.addEventListener('mousemove', throttle(onMouseMove, 10), false);
+  //canvas.addEventListener('mousemove', throttle(onMouseMove, 10), false);
 
   for (var i = 0; i < colors.length; i++){
     colors[i].addEventListener('click', onColorUpdate, false);
@@ -27,24 +27,31 @@
   onResize();
 
 
-  function drawLine(x0, y0, x1, y1, color, emit){
+  function drawBot(x,y,r,theta, color, emit){
     context.beginPath();
-    context.moveTo(x0, y0);
-    context.lineTo(x1, y1);
-    context.strokeStyle = color;
-    context.lineWidth = 2;
-    context.stroke();
+    console.log("drawBot",x,y,r,theta,color,emit);
+    context.arc(x,y,r,0,Math.PI*2);
+    // context.moveTo(x0, y0);
+    // context.lineTo(x1, y1);
+    context.fillStyle = color;
+    // context.lineWidth = 2;
+    context.fill();
     context.closePath();
 
     if (!emit) { return; }
-    var w = canvas.width;
-    var h = canvas.height;
+    // var w = canvas.width;
+    // var h = canvas.height;
 
     socket.emit('drawing', {
-      x0: x0 / w,
-      y0: y0 / h,
-      x1: x1 / w,
-      y1: y1 / h,
+      // x0: x0 / w,
+      // y0: y0 / h,
+      // x1: x1 / w,
+      // y1: y1 / h,
+      // color: color,
+      x: x,
+      y: y,
+      r: r,
+      theta: theta,
       color: color
     });
   }
@@ -58,15 +65,15 @@
   function onMouseUp(e){
     if (!drawing) { return; }
     drawing = false;
-    drawLine(current.x, current.y, e.clientX, e.clientY, current.color, true);
+    drawBot(e.clientX, e.clientY,10,0,current.color, true);
   }
 
-  function onMouseMove(e){
-    if (!drawing) { return; }
-    drawLine(current.x, current.y, e.clientX, e.clientY, current.color, true);
-    current.x = e.clientX;
-    current.y = e.clientY;
-  }
+  // function onMouseMove(e){
+  //   if (!drawing) { return; }
+  //   drawLine(current.x, current.y, e.clientX, e.clientY, current.color, true);
+  //   current.x = e.clientX;
+  //   current.y = e.clientY;
+  // }
 
   function onColorUpdate(e){
     current.color = e.target.className.split(' ')[1];
@@ -86,15 +93,15 @@
   }
 
   function onDrawingEvent(data){
-    var w = canvas.width;
-    var h = canvas.height;
-    drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+    // var w = canvas.width;
+    // var h = canvas.height;
+    drawBot(data.x, data.y, data.r, data.theta, data.color);
   }
 
   // make the canvas fill its parent
   function onResize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
   }
 
 })();
